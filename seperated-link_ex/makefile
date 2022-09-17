@@ -9,15 +9,15 @@ CFLAGS  = -g -Wall
 FLAGS = -ly -lfl
 
 # the build target executable:
-TARGET = example
+TARGET = file
 YYLEX = lex.yy.c
 
-all: $(TARGET)
+all: clean $(TARGET)
 
-$(TARGET): $(YYLEX) 
-	$(CC) $(YYLEX) -o $(TARGET) $(FLAGS)
+$(TARGET): $(YYLEX)
+	$(CC) $(YYLEX) main.c -o $(TARGET) $(FLAGS)
 
-$(YYLEX): 
+$(YYLEX):
 	$(FLEX) $(TARGET).l
 
 clean:
