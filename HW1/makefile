@@ -14,9 +14,9 @@ all: clean $(TARGET)
 $(TARGET):
 	$(CC) $(FLAGS) $(TARGET).c -o $(TARGET)
 
-# :
-# 	$(FLEX) $(TARGET).l
+ex1:
+	./$(TARGET) < ex1.txt
 
+.PHONY: clean
 clean:
-	$(RM) -rf $(TARGET) $(YYLEX)
-
+	rm -rf $(TARGET)
