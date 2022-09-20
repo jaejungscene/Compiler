@@ -17,6 +17,9 @@ $(TARGET):
 ex1:
 	./$(TARGET) < ex1.txt
 
+test:
+	./$(TARGET) < test.txt
+
 .PHONY: clean
 clean:
 	rm -rf $(TARGET)
