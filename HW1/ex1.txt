@@ -1,5 +1,5 @@
 start = 5;
 len = 4;
-str = “this is a string”:start-len;
-result = str:0-2 + “-” + str:3-1;
-result = result + “relationship”
+str = "this is a string":start-len;
+result = str:0-2 + "-" + str:3-1;
+result = result + "relationship"

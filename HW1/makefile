@@ -16,7 +16,10 @@ $(TARGET):
 
 ex1:
 	./$(TARGET) < ex1.txt
-
+ex2:
+	./$(TARGET) < ex2.txt
+ex3:
+	./$(TARGET) < ex3.txt
 test:
 	./$(TARGET) < test.txt
 

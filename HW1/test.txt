@@ -1,2 +1,2 @@
-start = "asdf"
+= %a1"
 "sdfa" flka

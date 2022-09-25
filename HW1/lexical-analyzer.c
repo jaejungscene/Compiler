@@ -18,7 +18,7 @@ typedef struct TableHead{
     // RecordPointer tail;
 }TableHead;
 
-typedef enum Type{Integer, Double, Operators}Type;
+// typedef enum Type{Integer, Double, Operators}Type;
 
 TableHead symbol_table_head;
 TableHead string_table_head;
@@ -55,6 +55,7 @@ int main(){
     return 0;
 }
 
+
 int isID_or_LETTER(char c){
     if((c>='a' && c<='z') || (c>='A' && c<='Z'))
         return 1;
@@ -85,6 +86,7 @@ int isOPERATOR(char c){
     else if(c=='/') return 4;
     else if(c=='=') return 5;
     else if(c==':') return 6;
+    else return 0;
 }
 
 
@@ -99,7 +101,7 @@ int get_id(char* line, int start, int line_num)
 
     while(1){
         c = line[start];
-        if(c==' ' || c=='\0' || c=='\n' || c==':' || c==';')
+        if(c==' ' || c=='\0' || c=='\n'  || c==';' || isSTRING(c) || isOPERATOR(c))
             break;
         else if(error_flag != 0){}
         else if(isDIGIT(c)){
@@ -122,19 +124,16 @@ int get_id(char* line, int start, int line_num)
 
     if(error_flag == 0){
         int index = add_data_table(&symbol_table_head, token);
-        printf("<ID, %d>\t\t%s\n", index, token);
+        printf("<ID, %d>\t\t\t%s\n", index, token);
     }
     else if(error_flag == 1){
-        printf("Error: line%d\t\t%s: can not exist digit at first\n",line_num, token);
+        printf("ERROR: line%d\t\t%s: ID can not exist digit at first\n",line_num, token);
     }
     else if(error_flag == 2){
-        printf("Error: line%d\t\t%s: can not exist letter after digit\n", line_num, token);
+        printf("ERROR: line%d\t\t%s: ID can not exist letter after digit\n", line_num, token);
     }
 
-    if(c==' ' || c=='\0' || c=='\n')
-        return ++start;
-    else
-        return start;
+    return start;
 }
 
 
@@ -144,9 +143,9 @@ int get_string(char* line, int start, int line_num)
     char c;
     char token[MAX_TOKEN] = {'\0'};
     int token_len = 0;
+    int flag = 0;
     // token[token_len] = line[start];
     while(1){
-        token_len++;
         start++;
         c = line[start];
         if(c=='\"'){
@@ -154,11 +153,22 @@ int get_string(char* line, int start, int line_num)
             start++;
             break;
         }
+        else if(c=='\0'){
+            flag = 1;
+            start++;
+            break;
+        }
         token[token_len] = c;
+        token_len++;
     }
-    printf("<STRING, %d>\t\t\"%s\"\n", add_data_table(&string_table_head, token), token);
+    if(flag==0)
+        printf("<STRING, %d>\t\t\"%s\"\n", add_data_table(&string_table_head, token), token);
+    else if(flag==1)
+        printf("ERROR: line%d\t\t%s: there is not \" mark\n", line_num, token);
     return start;
 }
+
+
 
 void print_operator(char c){
     char str[10] = {'\0'};
@@ -167,9 +177,8 @@ void print_operator(char c){
     else if(c=='*') strcpy(str, "MULTIPLE");
     else if(c=='/') strcpy(str, "DIVIDE");
     else if(c=='=') strcpy(str, "ASSIGN");
-    else if(c==':') strcpy(str, "COLON");
-    printf("<%s, >\t\t\"%c\"\n", str, c);
-
+    else if(c==':') strcpy(str, "COLONE");
+    printf("<%s, >\t\t%c\n", str, c);
 }
 
 int get_other(char* line, int start, int line_num)
@@ -177,57 +186,83 @@ int get_other(char* line, int start, int line_num)
     char c;
     char token[MAX_TOKEN] = {'\0'};
     int token_len = 0;
-    Type token_type = Integer;
-    int err_flag = 0;
+    // Type flag = Integer;
+    int flag = 0; // 0(semicolon) 1~99 (for error), 100~199 (for token type)
     while(1){
         c = line[start];
-        if(token_len==1 && isOPERATOR(line[start-1]) && isDIGIT(c)==0){
-            token_type = Operators;
-            break;
+        if(token_len==0){
+            if(isOPERATOR(c))   flag = 100; //operator
+            else if(isDIGIT(c))      flag = 101; //integer
+            else if(c==';'){
+                token[token_len] = c;
+                token_len++;
+                start++;
+                break;
+            }
+            else{//정의되어 있지 않은 문자
+                flag = 3; 
+                token[token_len] = c;
+                start++;
+                break;
+            } 
         }
-        else if(c=='.'){
-            token_type = Double;
+        else if(token_len==1){
+            if((isOPERATOR(line[start-1])==1||isOPERATOR(line[start-1])==2)){
+                if(c=='0')  flag = 4;   // 0에 부호가 있는 경우 ERROR
+                else if(isDIGIT(c))  flag = 101; //integer
+                else if(c=='.') flag = 102; //double
+            }
+            else if(line[start-1]=='0' && isDIGIT(c)){ //맨 앞에 0이왔을 때 다음 digit이 온 경우
+                flag = 1; //can't start with '0'    ERROR
+            }
+            else if(flag==100)  break;
+            else if(c==' ' || c=='\0' || c=='\n' || c==';' || isSTRING(c) || isOPERATOR(c)) break;
+            else if(isID_or_LETTER(c)) flag = 2; //can't exist letter   ERROR
         }
-        else if(token_len==0 && c==';'){
-            token[token_len] = c;
-            token_len++;
-            start++;
-            break;
-        }
-        else if(c==' ' || c=='\0' || c=='\n' || c==';' | c=='\"')
-            break;
-        else if(token_len==1 && line[start-1]=='0' && isDIGIT(c)){ // 맨앞에 0이 온 경우
-            err_flag = 1;
-        }
+        else if(c==' ' || c=='\0' || c=='\n' || c==';' || isSTRING(c) || isOPERATOR(c)) break;
+        else if(1<=flag && flag<=99){}
+        else if(c=='.') flag = 102; //double
+        else if(isID_or_LETTER(c)) flag = 2; //can't exist letter   ERROR
 
         token[token_len] = c;
         token_len++;
         start++;
     }
 
-    if(token_type==Operators){
+    if(flag==0){
+        printf("<SEMICOLON, >\t\t%s\n", token);
+    }
+    else if(flag==1){
+        printf("ERROR: line%d\t\t%s: can not start with \'0\'\n",line_num, token);
+    }
+    else if(flag==2){
+        printf("ERROR: line%d\t\t%s: can not exist letter after digit 01\n",line_num, token);
+    }
+    else if(flag==3){
+        printf("ERROR: line%d\t\t%s: undefined token\n",line_num, token);
+    }
+    else if(flag==4){
+        printf("ERROR: line%d\t\t%s: 0 can\'t take sign\n",line_num, token);
+    }
+    else if(flag==100){
         print_operator(token[0]);
     }
-    else if(token_type==Double){
-        printf("<DOUBLE, >\t\t%s\n", token);
-    }
-    else if(token_type==Integer){
+    else if(flag==101){
         printf("<INT, %s>\t\t%s\n", token, token);
     }
-    else{
-        printf("<SEMICOLON, >\t\t%s", token);
+    else if(flag==102){
+        printf("<DOUBLE, %s>\t\t%s\n", token, token);
     }
 
     return start;
 }
 
 
-
 void analyze_line(char* line, int line_num)
 {
     int start = 0;
     char c;
-    while(start <= strlen(line)){
+    while(start < strlen(line)){
         c = line[start];
         if(isID_or_LETTER(c)){
             start = get_id(line, start, line_num);
