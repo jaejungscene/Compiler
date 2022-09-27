@@ -12,7 +12,7 @@ TARGET = lexical-analyzer
 all: clean $(TARGET)
 
 $(TARGET):
-	$(CC) $(FLAGS) $(TARGET).c -o $(TARGET)
+	$(CC) $(FLAGS) $(TARGET).c lex.h -o $(TARGET)
 
 ex1:
 	./$(TARGET) < ex1.txt
