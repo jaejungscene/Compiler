@@ -61,4 +61,3 @@ void print_table(TableHead* head);
 void print_all();
 void free_table(TableHead* head);
 void free_all();
-

@@ -12,7 +12,7 @@ TARGET = lexical-analyzer
 all: clean $(TARGET)
 
 $(TARGET):
-	$(CC) $(FLAGS) $(TARGET).c lex.h -o $(TARGET)
+	$(CC) $(FLAGS) $(TARGET).c lex.h -o $(TARGET).out
 
 ex1:
 	./$(TARGET) < ex1.txt
@@ -25,4 +25,4 @@ test:
 
 .PHONY: clean
 clean:
-	rm -rf $(TARGET)
+	rm -rf $(TARGET).out

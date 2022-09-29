@@ -154,6 +154,7 @@ int get_other(char* line, int start, int line_num)
         if(token_len==0){
             if(isOPERATOR(c))   flag = 100; //operator
             else if(isDIGIT(c))      flag = 101; //integer
+            else if(c=='.')      flag = 101; //integer
             else if(c==';'){
                 token[token_len] = c;
                 token_len++;
@@ -171,7 +172,7 @@ int get_other(char* line, int start, int line_num)
             if((isOPERATOR(line[start-1])==1||isOPERATOR(line[start-1])==2) && c=='0')  flag = 4;   //ERROR: 0 can\'t take sign
             else if(line[start-1]=='0' && isDIGIT(c))   flag = 1; //ERROR: digit can't start with '0' or there should be only one '0'
             else if(flag==100)  break;
-            else if(c==';' || isBLANK(c) || isSTRING(c) || isOPERATOR(c)) break;
+            else if(c==';' || isBLANK(c) || isSTRING(c) || isOPERATOR(c) || !isDIGIT(c)) break;
             else if(c=='.') flag = 102; //double
             else if(isID_or_LETTER(c)) flag = 2; //ERROR: latter can't exist after digit
         }
