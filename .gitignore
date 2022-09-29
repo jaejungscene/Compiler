@@ -2,3 +2,4 @@ install
 test
 bin
 .vscode
+*.out
