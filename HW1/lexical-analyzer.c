@@ -74,7 +74,12 @@ int get_id(char* line, int start, int line_num)
         if(c==';' || isBLANK(c) || isSTRING(c) || isOPERATOR(c))
             break;
         else if(flag != 0){}
-        else if(!isDIGIT(c) && !isID_or_LETTER(c))    flag = 1; //ERROR: There is symbol that can't exist
+        else if(!isDIGIT(c) && !isID_or_LETTER(c)){
+            flag = 1; //ERROR: There is symbol that can't exist
+            token[token_len] = c;
+            start++;
+            break;
+        }
         else if(token_len==0 && isDIGIT(c))         flag = 2; //ERROR: ID should start with letter
         else if(digit_flag==0 && isDIGIT(c))        digit_flag = 1;
         else if(digit_flag==1 && isID_or_LETTER(c)) flag = 3; //ERROR: ID should end with a number
@@ -162,7 +167,7 @@ int get_other(char* line, int start, int line_num)
         if(token_len==0){
             if(isOPERATOR(c))   flag = 100; //operator
             else if(isDIGIT(c))      flag = 101; //integer
-            else if(c=='.')      flag = 101; //integer
+            else if(c=='.')      flag = 102; //double
             else if(c==';'){
                 token[token_len] = c;
                 token_len++;
