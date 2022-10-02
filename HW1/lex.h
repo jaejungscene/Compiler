@@ -48,6 +48,13 @@ int isBLANK(char c){
         return 0;
 }
 
+int isESCAPE_SEQ(char c){
+    if( c=='a'||c=='b'||c=='e'||c=='f'||c=='n'
+        ||c=='r'||c=='t'||c=='v'||c=='\\'||c=='\''||c=='?')
+        return 1;
+    else
+        return 0;
+}
 
 void init_table();
 

@@ -1,3 +1,6 @@
+"string\nstring"
+"string\nstring|
+"string\kstring"
 4%4
 abc123456789012345 = 0
 abc123456789012345 = 01
@@ -8,16 +11,3 @@ sta4%4
 s12hgf=-12;
 089fd=123+34;
 asd = 0123;
-qwe = 56;
-ghj = 0.321
-ghj = 21.3
-ghj = +21.3
-ghj = -21.3
-"ghj"=str:0-3
---x;
-x--;
-x++;
-++x;
-+0;
-0 +0 -0
--12

@@ -118,13 +118,21 @@ int get_string(char* line, int start, int line_num)
             start++;
             break;
         }
+        else if(line[start-1]=='\\' && isESCAPE_SEQ(c)==0){
+            flag = 2;
+            token[token_len] = c;
+            start++;
+            break;
+        }
         token[token_len] = c;
         token_len++;
     }
     if(flag==0)
         printf("<STRING, %d>\t\t\"%s\"\n", add_data_table(&string_table_head, token), token);
     else if(flag==1)
-        printf("ERROR: line%d\t\t\"%s => there is not \" mark\n", line_num, token);
+        printf("ERROR: line%d\t\t\"%s => there is not \" end mark\n", line_num, token);
+    else if(flag==2)
+        printf("ERROR: line%d\t\t\"%s => such escape sequence doesn\'t exist\n", line_num, token);
     return start;
 }
 
