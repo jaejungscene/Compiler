@@ -15,10 +15,13 @@ $(TARGET):
 	$(CC) $(FLAGS) $(TARGET).c lex.h -o $(TARGET).out
 
 ex1:
+	./$(TARGET).out < ex1.txt > ex1-result.txt
 	./$(TARGET).out < ex1.txt
 ex2:
+	./$(TARGET).out < ex2.txt > ex2-result.txt
 	./$(TARGET).out < ex2.txt
 ex3:
+	./$(TARGET).out < ex3.txt > ex3-result.txt
 	./$(TARGET).out < ex3.txt
 test:
 	./$(TARGET).out < test.txt

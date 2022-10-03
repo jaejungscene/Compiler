@@ -182,14 +182,14 @@ int get_other(char* line, int start, int line_num)
             } 
         }
         else if(token_len==1){
-            if((isOPERATOR(line[start-1])==1||isOPERATOR(line[start-1])==2) && c=='0')  flag = 4;   //ERROR: 0 can\'t take sign
-            else if(line[start-1]=='0' && isDIGIT(c))   flag = 1; //ERROR: digit can't start with '0' or there should be only one '0'
+            // if((isOPERATOR(line[start-1])==1||isOPERATOR(line[start-1])==2) && c=='0')  flag = 4;   //ERROR: 0 can\'t take sign
+            if(line[start-1]=='0' && isDIGIT(c))   flag = 1; //ERROR: digit can't start with '0' or there should be only one '0'
             else if(flag==100)  break;
-            else if(c==';' || isBLANK(c) || isSTRING(c) || isOPERATOR(c) || !isDIGIT(c)) break;
+            else if(c==';' || isBLANK(c) || isSTRING(c) || isOPERATOR(c)|| (!isDIGIT(c)&&!isID_or_LETTER(c))) break;
             else if(c=='.') flag = 102; //double
             else if(isID_or_LETTER(c)) flag = 2; //ERROR: latter can't exist after digit
         }
-        else if(c==';' || isBLANK(c) || isSTRING(c) || isOPERATOR(c)) break;
+        else if(c==';' || isBLANK(c) || isSTRING(c) || isOPERATOR(c) || (!isDIGIT(c)&&!isID_or_LETTER(c))) break;
         else if(1<=flag && flag<=99){}
         else if(c=='.') flag = 102; //double
         else if(isID_or_LETTER(c)) flag = 2; //ERROR: latter can't exist after digit
@@ -204,7 +204,7 @@ int get_other(char* line, int start, int line_num)
     else if(flag==1)
         printf("ERROR: line%d\t\t%s => can not start with \'0\' OR there should be only one \'0\'\n",line_num, token);
     else if(flag==2)
-        printf("ERROR: line%d\t\t%s => letter can not exist after digit\n",line_num, token);
+        printf("ERROR: line%d\t\t%s => letter can not exist after digit in ID\n",line_num, token);
     else if(flag==3)
         printf("ERROR: line%d\t\t%s => there is symbol that can\'t exist\n",line_num, token);
     else if(flag==4)

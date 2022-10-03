@@ -1,10 +1,13 @@
-qwe = 56;
+qwe = 5afd6;
+qwe = 5a%d6;
+qwe = 5%a6;
 str += qwe;
 ghj = 0.321
 ghj = 21.3
 ghj = +21.3
 ghj = -21.3
-"ghj"=str:0-3
+"string1"=-10+32
+"string2"=+.2-12
 --x;
 x--;
 x++;

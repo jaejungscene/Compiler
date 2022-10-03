@@ -1,0 +1,96 @@
+<ID, 1>			qwe
+<ASSIGN, >		=
+ERROR: line1		5afd6 => letter can not exist after digit in ID
+<SEMICOLON, >		;
+<ID, 1>			qwe
+<ASSIGN, >		=
+ERROR: line2		5a => letter can not exist after digit in ID
+ERROR: line2		% => there is symbol that can't exist
+<ID, 2>			d6
+<SEMICOLON, >		;
+<ID, 1>			qwe
+<ASSIGN, >		=
+<INT, 5>		5
+ERROR: line3		% => there is symbol that can't exist
+<ID, 3>			a6
+<SEMICOLON, >		;
+<ID, 4>			str
+<PLUS, >		+
+<ASSIGN, >		=
+<ID, 1>			qwe
+<SEMICOLON, >		;
+<ID, 5>			ghj
+<ASSIGN, >		=
+<INT, 0>		0
+<DOUBLE, .321>		.321
+<ID, 5>			ghj
+<ASSIGN, >		=
+<INT, 21>		21
+<DOUBLE, .3>		.3
+<ID, 5>			ghj
+<ASSIGN, >		=
+<PLUS, >		+
+<INT, 21>		21
+<DOUBLE, .3>		.3
+<ID, 5>			ghj
+<ASSIGN, >		=
+<MINUS, >		-
+<INT, 21>		21
+<DOUBLE, .3>		.3
+<STRING, 1>		"string1"
+<ASSIGN, >		=
+<MINUS, >		-
+<INT, 10>		10
+<PLUS, >		+
+<INT, 32>		32
+<STRING, 2>		"string2"
+<ASSIGN, >		=
+<PLUS, >		+
+<DOUBLE, .2>		.2
+<MINUS, >		-
+<INT, 12>		12
+<MINUS, >		-
+<MINUS, >		-
+<ID, 6>			x
+<SEMICOLON, >		;
+<ID, 6>			x
+<MINUS, >		-
+<MINUS, >		-
+<SEMICOLON, >		;
+<ID, 6>			x
+<PLUS, >		+
+<PLUS, >		+
+<SEMICOLON, >		;
+<PLUS, >		+
+<PLUS, >		+
+<ID, 6>			x
+<SEMICOLON, >		;
+<PLUS, >		+
+<INT, 0>		0
+<SEMICOLON, >		;
+<INT, 0>		0
+<PLUS, >		+
+<INT, 0>		0
+<MINUS, >		-
+<INT, 0>		0
+<MINUS, >		-
+<INT, 12>		12
+
+================< symbol table >===============
+   index	|	symbol
+-----------------------------------------------
+     1		|	qwe
+     2		|	d6
+     3		|	a6
+     4		|	str
+     5		|	ghj
+     6		|	x
+===============================================
+
+================< string table >===============
+   index	|	string
+-----------------------------------------------
+     1		|	"string1"
+     2		|	"string2"
+===============================================
+

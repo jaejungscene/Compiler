@@ -1,0 +1,63 @@
+<ID, 1>			start
+<ASSIGN, >		=
+<INT, 5>		5
+<SEMICOLON, >		;
+<ID, 2>			len
+<ASSIGN, >		=
+<INT, 4>		4
+<SEMICOLON, >		;
+<ID, 3>			str
+<ASSIGN, >		=
+<STRING, 1>		"this is a string"
+<COLONE, >		:
+<ID, 1>			start
+<MINUS, >		-
+<ID, 2>			len
+<SEMICOLON, >		;
+<ID, 4>			result
+<ASSIGN, >		=
+<ID, 3>			str
+<COLONE, >		:
+<INT, 0>		0
+<MINUS, >		-
+<INT, 2>		2
+<PLUS, >		+
+<STRING, 2>		"-"
+<PLUS, >		+
+<ID, 3>			str
+<COLONE, >		:
+<INT, 3>		3
+<MINUS, >		-
+<INT, 1>		1
+<SEMICOLON, >		;
+<ID, 4>			result
+<ASSIGN, >		=
+<ID, 4>			result
+<PLUS, >		+
+<STRING, 3>		"relationship"
+<ID, 5>			iamid124
+<ASSIGN, >		=
+<DOUBLE, 31.14>		31.14
+<INT, 0>		0
+<INT, 312>		312
+<DOUBLE, .32>		.32
+<DOUBLE, 12.1>		12.1
+
+================< symbol table >===============
+   index	|	symbol
+-----------------------------------------------
+     1		|	start
+     2		|	len
+     3		|	str
+     4		|	result
+     5		|	iamid124
+===============================================
+
+================< string table >===============
+   index	|	string
+-----------------------------------------------
+     1		|	"this is a string"
+     2		|	"-"
+     3		|	"relationship"
+===============================================
+

@@ -1,0 +1,57 @@
+<STRING, 1>		"string\nstring"
+ERROR: line2		"string\nstring| => there is not " end mark
+ERROR: line3		"string\k => such escape sequence doesn't exist
+<ID, 1>			string
+ERROR: line3		" => there is not " end mark
+<INT, 4>		4
+ERROR: line4		% => there is symbol that can't exist
+<INT, 4>		4
+<ID, 2>			abc1234567
+<ASSIGN, >		=
+<INT, 0>		0
+<ID, 2>			abc1234567
+<ASSIGN, >		=
+ERROR: line6		01 => can not start with '0' OR there should be only one '0'
+<ID, 2>			abc1234567
+<ASSIGN, >		=
+ERROR: line7		000 => can not start with '0' OR there should be only one '0'
+ERROR: line8		abc123$ => there is symbol that can't exist
+<INT, 56789012345>		56789012345
+<ASSIGN, >		=
+<INT, 231>		231
+<ID, 3>			start
+<ASSIGN, >		=
+ERROR: line9		% => there is symbol that can't exist
+ERROR: line10		sta4% => there is symbol that can't exist
+<INT, 4>		4
+ERROR: line11		s12hgf => ID should end with a number
+<ASSIGN, >		=
+<MINUS, >		-
+<INT, 12>		12
+<SEMICOLON, >		;
+ERROR: line12		089fd => can not start with '0' OR there should be only one '0'
+<ASSIGN, >		=
+<INT, 123>		123
+<PLUS, >		+
+<INT, 34>		34
+<SEMICOLON, >		;
+<ID, 4>			asd
+<ASSIGN, >		=
+ERROR: line13		0123 => can not start with '0' OR there should be only one '0'
+<SEMICOLON, >		;
+
+================< symbol table >===============
+   index	|	symbol
+-----------------------------------------------
+     1		|	string
+     2		|	abc1234567
+     3		|	start
+     4		|	asd
+===============================================
+
+================< string table >===============
+   index	|	string
+-----------------------------------------------
+     1		|	"string\nstring"
+===============================================
+
