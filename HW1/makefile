@@ -7,25 +7,25 @@ CC = gcc
 CFLAGS  = -g -Wall
 
 # the build target executable:
-TARGET = lexical-analyzer
+TARGET = hw1_201923674
 
 all: clean $(TARGET)
 
 $(TARGET):
-	$(CC) $(FLAGS) $(TARGET).c lex.h -o $(TARGET).out
+	$(CC) $(FLAGS) lexical-analyzer.c -o $(TARGET).exe
 
 ex1:
-	./$(TARGET).out < ex1.txt > ex1-result.txt
-	./$(TARGET).out < ex1.txt
+	./$(TARGET).exe < ex1.txt > ex1-result.txt
+	./$(TARGET).exe < ex1.txt
 ex2:
-	./$(TARGET).out < ex2.txt > ex2-result.txt
-	./$(TARGET).out < ex2.txt
+	./$(TARGET).exe < ex2.txt > ex2-result.txt
+	./$(TARGET).exe < ex2.txt
 ex3:
-	./$(TARGET).out < ex3.txt > ex3-result.txt
-	./$(TARGET).out < ex3.txt
+	./$(TARGET).exe < ex3.txt > ex3-result.txt
+	./$(TARGET).exe < ex3.txt
 test:
-	./$(TARGET).out < test.txt
+	./$(TARGET).exe < test.txt
 
 .PHONY: clean
 clean:
-	rm -rf $(TARGET).out
+	rm -rf $(TARGET).exe

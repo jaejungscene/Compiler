@@ -1,2 +1,5 @@
-ghj = 0.
+ghj = 2*31
+ghj = 2/31
+ghj = 2:31
+
 "strtd\n

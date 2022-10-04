@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "lex.h"
+#include "header.h"
 #define MAX_TOKEN 16
 #define MAX_LEN 50
 
@@ -80,9 +80,8 @@ int get_id(char* line, int start, int line_num)
             start++;
             break;
         }
-        else if(token_len==0 && isDIGIT(c))         flag = 2; //ERROR: ID should start with letter
         else if(digit_flag==0 && isDIGIT(c))        digit_flag = 1;
-        else if(digit_flag==1 && isID_or_LETTER(c)) flag = 3; //ERROR: ID should end with a number
+        else if(digit_flag==1 && isID_or_LETTER(c)) flag = 2; //ERROR: ID should end with a number
 
         if(token_len < 10){
             token[token_len] = c;
@@ -96,8 +95,6 @@ int get_id(char* line, int start, int line_num)
     else if(flag == 1)
         printf("ERROR: line%d\t\t%s => there is symbol that can\'t exist\n",line_num, token);
     else if(flag == 2)
-        printf("ERROR: line%d\t\t%s => ID should start with letter\n",line_num, token);
-    else if(flag == 3)
         printf("ERROR: line%d\t\t%s => ID should end with a number\n", line_num, token);
 
     return start;
@@ -182,7 +179,6 @@ int get_other(char* line, int start, int line_num)
             } 
         }
         else if(token_len==1){
-            // if((isOPERATOR(line[start-1])==1||isOPERATOR(line[start-1])==2) && c=='0')  flag = 4;   //ERROR: 0 can\'t take sign
             if(line[start-1]=='0' && isDIGIT(c))   flag = 1; //ERROR: digit can't start with '0' or there should be only one '0'
             else if(flag==100)  break;
             else if(c==';' || isBLANK(c) || isSTRING(c) || isOPERATOR(c)|| (!isDIGIT(c)&&!isID_or_LETTER(c))) break;
@@ -207,8 +203,6 @@ int get_other(char* line, int start, int line_num)
         printf("ERROR: line%d\t\t%s => letter can not exist after digit in ID\n",line_num, token);
     else if(flag==3)
         printf("ERROR: line%d\t\t%s => there is symbol that can\'t exist\n",line_num, token);
-    else if(flag==4)
-        printf("ERROR: line%d\t\t%s => 0 can\'t take sign\n",line_num, token);
     else if(flag==100)
         print_operator(token[0]);
     else if(flag==101)
@@ -220,9 +214,6 @@ int get_other(char* line, int start, int line_num)
 }
 
 
-/**
- * add data in table and return table index of added item
- */
 int add_data_table(TableHead* head, char* data)
 {
     RecordPointer new = head->first;

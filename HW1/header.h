@@ -57,12 +57,10 @@ int isESCAPE_SEQ(char c){
 }
 
 void init_table();
-
 int get_id(char* line, int start, int line_num);
 int get_string(char* line, int start, int line_num);
 int get_other(char* line, int start, int line_num);
 void analyze_line(char* line, int line_num);
-
 int add_data_table(TableHead* head, char* data);
 void print_table(TableHead* head);
 void print_all();
