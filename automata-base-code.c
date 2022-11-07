@@ -28,3 +28,5 @@ int main()
     // }
     return 0;
 }
+    // value = atof(str); //str to float
+    // value = atoi(str); //str to integer

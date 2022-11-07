@@ -18,13 +18,20 @@ $(YYLEX):
 	flex $(TARGET).l
 
 
-test02:
-	flex test02.l
-	gcc $(YYLEX) -o test02 $(FLAGS)
+TEST01 = test01
+$(TEST01):
+	flex $(TEST01).l
+	gcc $(YYLEX) -o $(TEST01) $(FLAGS)
+	rm $(YYLEX)
+
+MY = my
+$(MY):
+	flex $(MY).l
+	gcc $(YYLEX) -o $(MY) $(FLAGS)
 	rm $(YYLEX)
 
 clean:
-	$(RM) -rf $(TARGET) $(YYLEX)
+	$(RM) -rf $(TARGET) $(YYLEX) $(TEST01) $(MY)
 
 
 
