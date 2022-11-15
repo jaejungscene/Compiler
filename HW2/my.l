@@ -49,7 +49,7 @@ sub         (sub\(\".*\"\,[0-9]+\,[0-9]+\))
 int main(void)
 {
     int tok;
-    int count = 0;
+    int memory;
     initialize_symbol_table();
     while(!feof(stdin)){
         printf("\n>");
@@ -57,31 +57,47 @@ int main(void)
         tok = yylex();
         if(tok == -1)   {}
         else if(tok==0) {break;} //EOF
-        else if(tok==1) {goto repeat_here;}
+        else if(tok==1) {memory==1; goto repeat_here;}
         else if(tok==2) {
+            memory = 2;
             printf("syntax tree\n");
             /* print_syntax_tree(); */
+            goto repeat_here;
         }
         else if(tok==3){
+            memory = 3;
             printf("symbol table\n");
             /* print_symbol_table(); */
+            goto repeat_here;
         }
         else if(tok==4){
+            memory = 4;
             print_token_list();
+            printf("finish\n");
+            goto repeat_here;
         }
         else if(tok==5){
+            memory = 5;
             printf("runtime error: not real number, need integer\n");
+            continue;
         }
         else{
+            memory = -2;
             printf("lexical error: %s\n", yytext);
             token_num = 0;
             yyrestart(yyin);
-            initialize_token_list();
+            initialize_token_list_and_syntax_tree();
+            continue;
         }
+        /* printf("enter tok -1\n"); */
+        if(memory==1){
+            A();
+            /* initialize_token_list_and_syntax_tree(); */
+        }
+        else;
         /* free_sytax_tree(); */
-        /* syntax_tree_head = syntax_analyse(0); */
-        A();
+         // syntax analysis
         /* initialize_token_list(); */
     }
-    printf("exit...\n");
+    printf("\nexit...\n");
 }

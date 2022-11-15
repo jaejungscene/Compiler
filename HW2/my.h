@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <unistd.h>
 
 #define MAX_TYPE_LEN 7
 #define MAX_VALUE_LEN 64
@@ -9,7 +10,7 @@
 #define MAX_SYMBOL_TABLE 100
 #define MAX_TOKEN_LIST 100
 
-typedef enum TOK_NAME{ID=1, SUB, INT, REAL, STR, ASSIGN, PLUS, MINUS,  MULTI, DIVID, LB, RB}TOK_NAME;
+typedef enum TOK_NAME{ID=1, INT, REAL, STR, SUB, ASSIGN, PLUS, MINUS,  MULTI, DIVID, LB, RB}TOK_NAME;
 
 typedef struct Record* RecordPointer;
 typedef struct Record{
@@ -37,6 +38,7 @@ int token_num = 0;
 Record symbol_table[MAX_SYMBOL_TABLE];
 int symbol_num = 0;
 NodePointer syntax_tree_head;
+int tree_depth = 0;
 char* yylval;
 int LB_num = 0;
 int k = 0;
@@ -51,10 +53,11 @@ void initialize_symbol_table(){
     }
 }
 
-void initialize_token_list(){
+void initialize_token_list_and_syntax_tree(){
     for(int i=0; i<token_num; i++){
         free(token_list[i]);
     }
+    token_num = 0;
 }
 
 TOK_NAME check_INT_REAL(char* str){
@@ -136,10 +139,18 @@ int save_token(TOK_NAME tag, char* token)
     return 1;
 }
 
+bool isOperator(TOK_NAME tag){
+    if(tag==PLUS || tag==MINUS || tag==MULTI || tag==DIVID ||
+        tag==SUB || tag==ASSIGN)
+        return true;
+    else
+        return false;
+}
 
 void print_symbol_table(){
     
 }
+
 
 void print_token_list(){
     for(int i=0; i<token_num; i++){
@@ -153,126 +164,279 @@ void print_token_list(){
     printf("\n");
 }
 
-void print_syntax_tree();
 
+void print_syntax_tree(){
+    NodePointer parent = syntax_tree_head;
+    NodePointer now = syntax_tree_head;
+    int count = 0;
+    int node_num = 0;
 
-void free_sytax_tree();
+    // root node
+    if(now->left != NULL) count++;
+    if(now->mid != NULL) count++;
+    if(now->right != NULL) count++;
+    printf("%s%d\n",now->data.str, count);
+    node_num = count;
+    now = now->left;
 
+    // othres node
 
-void A(){
-    // printf("enter A\n");
-    if(k>=token_num) return;
-    if(token_list[k]->tag==ID){
-        printf("%s ", token_list[k]->data.str);
-        k++;
-        restA();
-    }
-    else{
-        restF();
-        restT();
-        restE();
-    }
-}
-
-void restA(){
-    // printf("enter restA\n");
-    if(k>=token_num) return;
-    if(token_list[k]->tag==ASSIGN){
-        printf("%s ", token_list[k]->data.str);
-        k++;
-        A();
-    }
-    else{
-        restT();
-        restE();
-    }
-}
-
-void E(){
-    // printf("enter E\n");
-    if(k>=token_num) return;
-    T();
-    restE();
-}
-
-void restE(){
-    // printf("enter restE\n");
-    if(k>=token_num) return;
-    if(token_list[k]->tag==PLUS){
-        printf("%s ", token_list[k]->data.str);
-        k++;
-        T();
-        restE();
-    }
-    else;
-}
-
-void T(){
-    // printf("enter T\n");
-    if(k>=token_num) return;
-    F();
-    restT();
-}
-
-void restT(){
-    // printf("enter restT\n");
-    if(k>=token_num) return;
-    if(token_list[k]->tag==MULTI){
-        printf("%s ", token_list[k]->data.str);
-        k++;
-        F();
-        restT();
-    }
-    else;
-}
-
-void F(){
-    // printf("enter F\n");
-    if(k>=token_num) return;
-    if(token_list[k]->tag==ID){
-        printf("%s ", token_list[k]->data.str);
-        k++;
-    }
-    else{
-        restF();
-    }
-}
-
-void restF(){
-    // printf("enter restF\n");
-    if(k>=token_num) return;
-    if(token_list[k]->tag==LB){
-        printf("%s ", token_list[k]->data.str);
-        k++;
-        A();
-        if(token_list[k]->tag==RB){
-            printf("%s ", token_list[k]->data.str);
-            k++;
+    for(int i=1; i<tree_depth; i++){
+        count = 0;
+        while(node_num<=0){
+            if(isOperator(now->tag)){
+                if(now->left != NULL) count++;
+                if(now->mid != NULL) count++;
+                if(now->right != NULL) count++;
+                printf("%s%d\n",now->data.str, count);
+            }
+            else{
+                printf("");
+                count++;
+            }
+            node_num--;
         }
-        else
-            printf("\n\n**error**\n\n");
+        node_num = count;
+        now = now->left;
+    }
+};
+
+
+
+
+
+NodePointer A(){
+    // printf("enter A\n"); //sleep(1);
+    if(k>=token_num) return NULL;
+    if(token_list[k]->tag==ID){
+        // printf("%s\n", token_list[k]->data.str);
+        NodePointer temp = token_list[k];
+        k++;
+        NodePointer parent = restA();
+        NodePointer iter = parent;
+        whlie((iter->left)!=NULL){
+            iter = iter->left;
+        }
+        iter->left = temp;
+        return parent;
+    }
+    else{
+        NodePointer temp1 = restF();
+        NodePointer temp2 = restT();
+        NodePointer temp3 = restE();
+        NodePointer iter = temp3;
+        while((iter->left)!=NULL){
+            iter = iter->left;
+        }
+        iter->left = temp2;
+        NodePointer iter = temp2;
+        while((iter->left)!=NULL){
+            iter = iter->left;
+        }
+        iter->left = temp1;
+        return temp3;
+    }
+}
+
+NodePointer restA(){
+    // printf("enter restA\n"); //sleep(1);
+    if(k>=token_num) return NULL;
+    if(token_list[k]->tag==ASSIGN){
+        // printf("%s\n", token_list[k]->data.str);
+        // if(syntax_tree_head == NULL) syntax_tree_head = token_list[k];
+        NodePointer temp = token_list[k];
+        k++;
+        temp->right = A();
+        return temp;
+    }
+    else{ 
+        NodePointer parent1 = restT();
+        NodePointer parent2 = restE();
+        if(parent1==NULL && parent2==NULL){
+            return NULL;
+        }
+        else if(parent1==NULL){
+            return parent2;
+        }
+        else if(parent2==NULL){
+            return parent1;
+        }
+        else{
+            NodePointer temp = parent2;
+            while((temp->left)!=NULL){
+                temp = temp->left;
+            }
+            temp->left = parent1;
+            return parent2;
+        }
+    }
+}
+
+NodePointer E(){
+    // printf("enter E\n"); //sleep(1);
+    if(k>=token_num) return NULL;
+    NodePointer child = T();
+    NodePointer parent restE();
+    NodePointer temp = parent;
+    while((temp->left)!=NULL){
+        temp = temp->left;
+    }
+    temp->left = child;
+    return parent;
+}
+
+NodePointer restE(){
+    // printf("enter restE\n"); //sleep(1);
+    if(k>=token_num) return NULL;
+    if(token_list[k]->tag==PLUS || token_list[k]->tag==MINUS){
+        // printf("%s\n", token_list[k]->data.str);
+        NodePointer temp = token_list[k];
+        k++;
+        temp->right = T();
+        NodePointer parent = restE();
+        if(parent!=NULL){
+            parent->left = temp;
+            return parent;
+        }
+        else{
+            return temp;
+        }
+    }
+    // else if(token_list[k]->tag==MINUS){
+    //     printf("%s\n", token_list[k]->data.str);
+    //     k++;
+    //     T();
+    //     restE();
+    // }
+    else return NULL;
+}
+
+
+NodePointer T(){
+    // printf("enter T\n"); //sleep(1);
+    if(k>=token_num) return NULL;
+    NodePointer child = F();
+    NodePointer parent = restT();
+    NodePointer temp = parent;
+    while((temp->left)!=NULL){
+        temp = temp->left;
+    }
+    temp->left = child;
+    return parent;
+}
+
+
+NodePointer restT(){
+    printf("enter restT\n"); //sleep(1);
+    if(k>=token_num) return NULL;
+    if(token_list[k]->tag==MULTI || token_list[k]->tag==DIVID){
+        // printf("%s\n", token_list[k]->data.str);
+        NodePointer temp = token_list[k];
+        k++;
+        temp->right = F();
+        NodePointer parent = restT();
+        if(parent!=NULL){
+            parent->left = temp;
+            return parent;
+        }
+        else{
+            return temp;
+        }
+    }
+    // else if(token_list[k]->tag==DIVID){
+    //     // printf("%s\n", token_list[k]->data.str);
+    //     NodePointer temp = token_list[k];
+    //     k++;
+    //     temp->right = F();
+    //     NodePointer parent = restT();
+    //     parent->left = temp;
+    //     return parent;
+    // }
+    else NULL;
+}
+
+
+NodePointer F(){
+    printf("enter F\n"); //sleep(1);
+    if(k>=token_num) return NULL;
+    if(token_list[k]->tag==ID){
+        // printf("%s\n", token_list[k]->data.str);
+        NodePointer temp = token_list[k];
+        k++;
+        return temp;
+    }
+    else{
+        return restF();
+    }
+}
+
+NodePointer restF(){
+    printf("enter restF\n"); //sleep(1);
+    if(k>=token_num) return NULL;
+    if(token_list[k]->tag==LB){
+        // printf("%s\n", token_list[k]->data.str);
+        k++;
+        NodePointer temp = A();
+        if(token_list[k]->tag==RB){
+            // printf("%s\n", token_list[k]->data.str);
+            k++;
+            return temp;
+        }
+        else{
+            printf("\n\nsytax error: there should be \')\'\n\n");
+            return (NodePointer)-1;
+        }
     }
     else if(token_list[k]->tag==INT){
-        printf("%d ", token_list[k]->data.i);
+        // printf("%d\n", token_list[k]->data.i);
+        NodePointer temp = token_list[k];
         k++;
+        return temp;
     }
     else if(token_list[k]->tag==REAL){
-        printf("%f ", token_list[k]->data.f);
+        // printf("%f\n", token_list[k]->data.f);
+        NodePointer temp = token_list[k];
         k++;
+        return temp;
     }
     else if(token_list[k]->tag==STR){
-        printf("%s ", token_list[k]->data.str);
+        // printf("%s\n", token_list[k]->data.str);
+        NodePointer temp = token_list[k];
         k++;
+        return temp;
+    }
+    else if(token_list[k]->tag==MINUS){ //unary operator
+        // printf("%s\n", token_list[k]->data.str);
+        NodePointer temp = token_list[k];
+        k++;
+        temp->left = F();
+    }
+    else if(token_list[k]->tag==PLUS){
+        // printf("%s\n", token_list[k]->data.str);
+        NodePointer temp = token_list[k];
+        k++;
+        temp->left = F();
     }
     else if(token_list[k]->tag==SUB){
+        // printf("%s\n", token_list[k]->data.str);
+        NodePointer temp = token_list[k];
+        k++;
         if(token_list[k]->tag==STR){
-            printf("%s ", token_list[k]->data.str);
+            // printf("%s\n", token_list[k]->data.str);
+            temp->left = token_list[k];
             k++;
+            temp->mid = E();
+            temp->right = E();
+            return temp;
         }
-        else
-            printf("\n\n**error**\n\n");
-        E();
-        E();
+        else{
+            // printf("\n\nsyntax error: 01\n\n");
+            return (NodePointer)-1;
+        }
+    }
+    else{
+        // printf("\n\nsyntax error: 02\n\n");
+        return (NodePointer)-1;
     }
 
 }
@@ -297,7 +461,7 @@ void restF(){
 } */
 
 
-// void add_symbol_table(NodePointer node){
+// void add_symbol_table(NodePointer now){
 //     int i = 0;
 //     while(i<=token_num){
 //         if(token_list[i]==ID){
@@ -308,102 +472,5 @@ void restF(){
 // }
 
 
-bool isOperator(TOK_NAME tag){
-    if(tag==PLUS, tag==MINUS, tag==MULTI, tag==DIVID)
-        return true;
-    else
-        return false;
-}
 
-
-// NodePointer syntax_analyse(int i){
-//     if((token_list[i]->tag==ID || token_list[i]->tag==INT || token_list[i]->tag==REAL|| token_list[i]->tag==STR)
-//     && token_list[i+1]->tag == 0){ //바로 처음 token만 있을 때
-//         return token_list[i];
-//     }
-//     else if(token_list[i]->tag==ID && token_list[i+1]->tag==ASSIGN){
-//         NodePointer root = token_list[i+1];
-//         root->left = token_list[i];
-//         i+=2;
-//         root->right = syntax_analyse(i);
-//         return root;
-//     }
-//     else if(0==i || token_list[i-1]->tag==ID){
-//         if((token_list[i]->tag==PLUS || token_list[i]->tag==MINUS)){ //부호 있는 숫자
-//             NodePointer temp = token_list[i];
-//             token_list[i] = token_list[i+1];
-//             token_list[i+1] = temp;
-//             token_list[i+1]->left = token_list[i];
-//             i+=2;
-//         }
-//         else if(token_list[i+1]->tag==REAL || token_list[i+1]->tag==INT || token_list[i+1]->tag==STR || token_list[i+1]->tag==ID){
-//             i++;
-//         }
-//         token_list[i]->left = token_list[i-1]; //i은 operator
-
-//         if((token_list[i]->tag==MULTI || token_list[i]->tag==DIVID) || ((token_list[i]->tag==PLUS || token_list[i]->tag==MINUS)&&((token_list[i+2]->tag==PLUS || token_list[i+2]->tag==MINUS)))){
-//             token_list[i]->right = token_list[i+1]; // 일단 숫자 저장
-//             i+=2;
-//             NodePointer root = syntax_analyse(i);
-//             root->left = token_list[i-2];
-//             return root;
-//         }
-//         else if(token_list[i+1]->tag==LB || token_list[i+1]->tag==SUB){
-//             i++;
-//             token_list[i-1]->right = syntax_analyse(i);
-//             return token_list[i-1];
-//         }
-//     }
-//     else if(token_list[i]->tag==LB){ // ( 나왔을 시
-//         while(token_list[i]->tag==LB){
-//             LB_num++;
-//             i++;
-//         }
-//         i++;
-//         token_list[i+1]->left = token_list[i];
-//         if(token_list[i+2]->tag==INT || token_list[i+2]->tag==REAL || token_list[i+2]->tag==ID){
-//             token_list[i+1]->right = token_list[i+2];
-//         }
-//         else if(token_list[i+2]->tag==LB || token_list[i+2]->tag==SUB){
-//             i+=2;
-//             token_list[i-1]->right = syntax_analyse(i);
-//             return token_list[i-1];
-//         }
-//     }
-//     else if(token_list[i]->tag==INT || token_list[i]->tag==REAL){
-//         token_list[i+1]->left = token_list[i];
-//         i++;
-//         if((token_list[i]->tag==MULTI || token_list[i]->tag==DIVID) || ((token_list[i]->tag==PLUS || token_list[i]->tag==MINUS)&&((token_list[i+2]->tag==PLUS || token_list[i+2]->tag==MINUS)))){
-//             token_list[i]->right = token_list[i+1]; // 일단 숫자 저장
-//             i+=2;
-//             NodePointer root = syntax_analyse(i);
-//             root->left = token_list[i-2];
-//             return root;
-//         }
-//         else if(token_list[i+1]->tag==LB || token_list[i+1]->tag==SUB || 
-//         ((token_list[i]->tag==PLUS || token_list[i]->tag==MINUS) && (token_list[i+2]->tag==MULTI || token_list[i+2]->tag==DIVID))){
-//             i++;
-//             token_list[i-1]->right = syntax_analyse(i);
-//             return token_list[i-1];
-//         }
-//     }
-//     else if(i!=0 && (token_list[i]->tag==PLUS || token_list[i]->tag==MINUS)){
-//         if((token_list[i+1]->tag==INT || token_list[i+1]->tag==REAL || token_list[i+1]->tag==ID) && token_list[i+1]->tag==0){
-//             token_list[i]->right = token_list[i+1];
-//             return token_list[i];
-//         }
-//         else if((token_list[i+2]->tag==PLUS || token_list[i+2]->tag==MINUS)){
-//             i+=2;
-//             NodePointer root = syntax_analyse(i);
-//             root->left = token_list[i-2];
-//             return root;
-//         }
-//         else if(token_list[i+1]->tag==LB || token_list[i+1]->tag==SUB ||
-//         ((token_list[i+2]->tag==MULTI || token_list[i+2]->tag==DIVID))){
-//             i++;
-//             token_list[i-1]->right = syntax_analyse(i);
-//             return token_list[i-1];
-//         }
-//     }
-// }
 
