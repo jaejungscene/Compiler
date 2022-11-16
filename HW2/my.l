@@ -5,18 +5,11 @@
 #include <stdbool.h> 
 #include "my.h"
 
-// void initialize_symbol_table();
-// void initialize_token_list();
-// int save_token(TOK_NAME tag, char* token);
-// void print_token_list();
-// NodePointer syntax_analyse(int i);
-
-
 %}
 
 id          [a-zA-Z][a-zA-Z0-9]*
 integer     [1-9][0-9]*
-realNum     (0|[1-9][0-9]*)\.(0|[0-9]*[1-9])*
+realNum     (0|[1-9][0-9]*)*\.(0|[0-9]*[1-9])*
 string      \".*\"
 sub         (sub\(\".*\"\,[0-9]+\,[0-9]+\))
 
@@ -39,7 +32,6 @@ sub         (sub\(\".*\"\,[0-9]+\,[0-9]+\))
 ","         {return 1;}
 "$asp"      {return 2;}
 "$symbol"   {return 3;}
-"$tok"      {return 4;}
 .           {return -5;}
 
 
@@ -57,23 +49,17 @@ int main(void)
         tok = yylex();
         if(tok == -1)   {}
         else if(tok==0) {break;} //EOF
-        else if(tok==1) {memory==1; goto repeat_here;}
+        else if(tok==1) {memory=1; goto repeat_here;}
         else if(tok==2) {
             memory = 2;
-            printf("syntax tree\n");
-            /* print_syntax_tree(); */
+            /* printf("syntax tree\n"); */
+            print_syntax_tree();
             goto repeat_here;
         }
         else if(tok==3){
             memory = 3;
-            printf("symbol table\n");
-            /* print_symbol_table(); */
-            goto repeat_here;
-        }
-        else if(tok==4){
-            memory = 4;
-            print_token_list();
-            printf("finish\n");
+            /* printf("symbol table\n"); */
+            print_symbol_table();
             goto repeat_here;
         }
         else if(tok==5){
@@ -86,18 +72,33 @@ int main(void)
             printf("lexical error: %s\n", yytext);
             token_num = 0;
             yyrestart(yyin);
-            initialize_token_list_and_syntax_tree();
+            initialize_token_list_and_free_syntax_tree();
             continue;
         }
         /* printf("enter tok -1\n"); */
         if(memory==1){
-            A();
+            if(syntax_tree_head!=NULL){
+                free_syntax_tree(syntax_tree_head);
+            }
+            syntax_tree_head = make_syntax_tree();
+            tree_depth = dfs_for_depth(syntax_tree_head, 0);
+            RESULT result = dfs_result(syntax_tree_head);
+            if(result.tag==INT){
+                printf("%d\n",result.data.i);
+            }
+            else if(result.tag==REAL){
+                printf("%.4f\n",result.data.f);
+            }
+            else if(result.tag==STR){
+                printf("\"%s\"\n",result.data.str);
+            }
+            initialize_token_list();
             /* initialize_token_list_and_syntax_tree(); */
         }
-        else;
-        /* free_sytax_tree(); */
-         // syntax analysis
-        /* initialize_token_list(); */
+        else{
+            /* printf("%d\n", memory);
+            printf("else\n"); */
+        };
     }
     printf("\nexit...\n");
 }
