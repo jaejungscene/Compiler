@@ -48,6 +48,15 @@ typedef struct Node{
     NodePointer next;
 }Node;
 
+NodePointer token_list[MAX_TOKEN_LIST];
+int token_num = 0;
+Record symbol_table[MAX_SYMBOL_TABLE];
+int symbol_num = 0;
+NodePointer syntax_tree_head;
+int tree_depth = 0;
+char* yylval;
+int k = 0; // using when syntax analyse
+
 RESULT func(){
     RESULT result;
     result.tag = INT;
@@ -94,7 +103,14 @@ int main(void){
     char s2[10] = "abc";
     char str[30] = "sub(hello3, 5, 10)";
 
-    save("sub(hello3, 5,  10)");
+    
+    token_list[0] = (NodePointer)malloc(sizeof(Node));
+    NodePointer ptr = token_list[0];
+    token_list[0]->data.i = 12;
+    printf("%d\n", token_list[0]->data.i);
+    token_list[0] = NULL;
+    free(ptr);
+    // save("sub(hello3, 5,  10)");
     // char* ptr;
 
 

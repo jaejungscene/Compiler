@@ -8,18 +8,20 @@
 %}
 
 id          [a-zA-Z][a-zA-Z0-9]*
+idx         [0-9]*
 integer     [1-9][0-9]*
 realNum     (0|[1-9][0-9]*)*\.(0|[0-9]*[1-9])*
 string      \".*\"
-sub         (sub\(\".*\"\,[0-9]+\,[0-9]+\))
 
 %%
 
+
+"sub"       {return save_token(SUB, yytext);}
+{idx}       {return save_token(INT, yytext);}
 {id}        {return save_token(ID, yytext);}
 {integer}   {return save_token(INT, yytext);}
 {realNum}   {return save_token(REAL, yytext);}
 {string}    {return save_token(STR, yytext);}
-{sub}       {return save_token(SUB, yytext);}
 "+"         {return save_token(PLUS, yytext);}
 "-"         {return save_token(MINUS, yytext);}
 "*"         {return save_token(MULTI, yytext);}
@@ -77,12 +79,18 @@ int main(void)
         }
         /* printf("enter tok -1\n"); */
         if(memory==1){
-            if(syntax_tree_head!=NULL){
-                free_syntax_tree(syntax_tree_head);
-            }
+            backup_syntax_tree_head = syntax_tree_head;
+
+            /* print_token_list(); // <--------------- */
             syntax_tree_head = make_syntax_tree();
+/* printf("check01\n"); */
+            if(syntax_tree_head==NULL)
+                syntax_tree_head = backup_syntax_tree_head;
+/* printf("check02\n"); */
             tree_depth = dfs_for_depth(syntax_tree_head, 0);
+/* printf("check03\n"); */
             RESULT result = dfs_result(syntax_tree_head);
+/* printf("check04\n"); */
             if(result.tag==INT){
                 printf("%d\n",result.data.i);
             }
@@ -92,7 +100,9 @@ int main(void)
             else if(result.tag==STR){
                 printf("\"%s\"\n",result.data.str);
             }
-            initialize_token_list();
+
+            /* print_syntax_tree(); */
+            /* initialize_token_list(); */
             /* initialize_token_list_and_syntax_tree(); */
         }
         else{
@@ -102,3 +112,5 @@ int main(void)
     }
     printf("\nexit...\n");
 }
+// hello3 = "hello"*3
+// sub(hello3, 5, 10)

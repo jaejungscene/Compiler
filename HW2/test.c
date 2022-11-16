@@ -131,9 +131,15 @@ void init01()
     // save_token(PLUS,"+");
     // save_token(INT,"3");
     // save_token(RB,")");
-    save_token(ID,"hello");
-    save_token(ASSIGN,"=");
+    save_token(SUB,"sub");
+    save_token(LB,"(");
     save_token(STR,"\"hello\"");
+    save_token(INT,"0");
+    save_token(INT,"3");
+    save_token(RB,")");
+    // save_token(RB,")");
+    // save_token(ASSIGN,"=");
+    // save_token(STR,"\"hello\"");
     // save_token(ID,"i");
     // save_token(ASSIGN,"=");
     // save_token(MINUS,"-");
@@ -152,7 +158,8 @@ void init02(){
 }
 
 void init03(){
-    save_token(SUB,"sub(hello3, 5, 10)");
+    // save_token(SUB,"sub(hello3, 5, 10)");
+    // save_token(SUB,"sub(\"hello3\", 5, 10)");
 
     // save_token(ID,"val");
     // save_token(PLUS,"+");
@@ -162,12 +169,15 @@ void init03(){
 
 int main(void)
 {
-    for(int i=0; i<3; i++){
+    for(int i=0; i<1; i++){
         if(i==0) init01();
         if(i==1) init02();
         if(i==2) init03();
         printf("@@@@@@@@@@@@@@@@@ %d @@@@@@@@@@@@@@\n", i);
         print_token_list();
+        if(syntax_tree_head!=NULL){
+            free_syntax_tree(syntax_tree_head);
+        }
         syntax_tree_head = make_syntax_tree();
         tree_depth = dfs_for_depth(syntax_tree_head, 0);
         print_syntax_tree();
@@ -184,12 +194,11 @@ int main(void)
         }
         printf("---------------------------------\n");        
         print_symbol_table();
-        initialize_token_list_and_free_syntax_tree();
+        // initialize_token_list();
         printf("---------------------------------\n\n\n\n");
     }
     return 0;
 }
-
 
 
 void print_symbol_table()
@@ -527,7 +536,6 @@ void free_syntax_tree(NodePointer node)
         free_syntax_tree(node->left);
         free_syntax_tree(node->mid);
         free_syntax_tree(node->right);
-        free_syntax_tree(node->next);
         free(node);
     }
 }
@@ -545,9 +553,6 @@ void initialize_token_list_and_free_syntax_tree()
 
 void initialize_token_list()
 {// syntax tree가 완성 되었을 때
-    for(int i=0; i<token_num; i++){
-        token_list[i] = NULL;
-    }
     token_num = 0;
     k = 0;
 }
@@ -568,69 +573,69 @@ TOK_NAME check_INT_REAL(char* str)
 int save_token(TOK_NAME tag, char* token)
 {   
     // printf("save_token\n");
-    if(tag==SUB){
-        char tempStr[MAX_VALUE_LEN];
-        strcpy(tempStr, token);
-        char* ptr;
-        NodePointer newNode;
-        ptr = strtok(tempStr,"(");
-        newNode = (NodePointer)malloc(sizeof(Node));
-        newNode->left = NULL;
-        newNode->mid = NULL;
-        newNode->right = NULL;
-        newNode->next = NULL;
-        newNode->tag = SUB;
-        strcpy(newNode->data.str, ptr); //sub
-        token_list[token_num] = newNode;
-        token_num++;
+    // if(tag==SUB){
+    //     char tempStr[MAX_VALUE_LEN];
+    //     strcpy(tempStr, token);
+    //     char* ptr;
+    //     NodePointer newNode;
+    //     ptr = strtok(tempStr,"(");
+    //     newNode = (NodePointer)malloc(sizeof(Node));
+    //     newNode->left = NULL;
+    //     newNode->mid = NULL;
+    //     newNode->right = NULL;
+    //     newNode->next = NULL;
+    //     newNode->tag = SUB;
+    //     strcpy(newNode->data.str, ptr); //sub
+    //     token_list[token_num] = newNode;
+    //     token_num++;
 
-        ptr = strtok(NULL,", ");
-        newNode = (NodePointer)malloc(sizeof(Node));
-        newNode->left = NULL;
-        newNode->mid = NULL;
-        newNode->right = NULL;
-        newNode->next = NULL;
-        if(ptr[0]=='\"'){
-            newNode->tag = STR;
-            strncpy(newNode->data.str, &ptr[1], strlen(ptr)-2);
-            newNode->data.str[strlen(ptr)-2] = '\0'; //"string"
-        }
-        else{ //ID이면 미리 바꿈.
-            newNode->tag = ID;
-            strcpy(newNode->data.str, ptr); //"string"
-        }
-        token_list[token_num] = newNode;
-        token_num++;
+    //     ptr = strtok(NULL,", ");
+    //     newNode = (NodePointer)malloc(sizeof(Node));
+    //     newNode->left = NULL;
+    //     newNode->mid = NULL;
+    //     newNode->right = NULL;
+    //     newNode->next = NULL;
+    //     if(ptr[0]=='\"'){
+    //         newNode->tag = STR;
+    //         strncpy(newNode->data.str, &ptr[1], strlen(ptr)-2);
+    //         newNode->data.str[strlen(ptr)-2] = '\0'; //"string"
+    //     }
+    //     else{ //ID이면 미리 바꿈.
+    //         newNode->tag = ID;
+    //         strcpy(newNode->data.str, ptr); //"string"
+    //     }
+    //     token_list[token_num] = newNode;
+    //     token_num++;
 
-        ptr = strtok(NULL," ,");
-        newNode = (NodePointer)malloc(sizeof(Node));
-        newNode->left = NULL;
-        newNode->mid = NULL;
-        newNode->right = NULL;
-        newNode->next = NULL;
-        newNode->tag = INT;
-        if(REAL == check_INT_REAL(ptr)){
-            return 5;
-        }
-        newNode->data.i = atoi(ptr); //int
-        token_list[token_num] = newNode;
-        token_num++;
+    //     ptr = strtok(NULL," ,");
+    //     newNode = (NodePointer)malloc(sizeof(Node));
+    //     newNode->left = NULL;
+    //     newNode->mid = NULL;
+    //     newNode->right = NULL;
+    //     newNode->next = NULL;
+    //     newNode->tag = INT;
+    //     if(REAL == check_INT_REAL(ptr)){
+    //         return 5;
+    //     }
+    //     newNode->data.i = atoi(ptr); //int
+    //     token_list[token_num] = newNode;
+    //     token_num++;
 
-        ptr = strtok(NULL,")");
-        newNode = (NodePointer)malloc(sizeof(Node));
-        newNode->left = NULL;
-        newNode->mid = NULL;
-        newNode->right = NULL;
-        newNode->next = NULL;
-        newNode->tag = INT;
-        if(REAL == check_INT_REAL(ptr)){
-            return 5;
-        }
-        newNode->data.i = atoi(ptr); //int
-        token_list[token_num] = newNode;
-        token_num++;
-    }
-    else{
+    //     ptr = strtok(NULL,")");
+    //     newNode = (NodePointer)malloc(sizeof(Node));
+    //     newNode->left = NULL;
+    //     newNode->mid = NULL;
+    //     newNode->right = NULL;
+    //     newNode->next = NULL;
+    //     newNode->tag = INT;
+    //     if(REAL == check_INT_REAL(ptr)){
+    //         return 5;
+    //     }
+    //     newNode->data.i = atoi(ptr); //int
+    //     token_list[token_num] = newNode;
+    //     token_num++;
+    // }
+    // else{
         NodePointer newNode = (NodePointer)malloc(sizeof(Node));
         newNode->tag = tag;
         if(tag==INT)
@@ -638,14 +643,8 @@ int save_token(TOK_NAME tag, char* token)
         else if(tag==REAL)
             newNode->data.f = atof(token);
         else if(tag==STR){
-            // printf("token: %s\n", token);
-            // printf("token: %c\n", token[0]);
-            // printf("token: %c\n", token[strlen(token)-1]);
-            // token[strlen(token)-1] = '\0';
-            // printf("check\n");
             strncpy(newNode->data.str, &token[1], strlen(token)-2);
             newNode->data.str[strlen(token)-2] = '\0';
-            printf("newNode->data.str: %s\n",newNode->data.str);
         }
         else
             strcpy(newNode->data.str, token);
@@ -655,7 +654,7 @@ int save_token(TOK_NAME tag, char* token)
         newNode->next = NULL;
         token_list[token_num] = newNode;
         token_num++;
-    }
+    // }
     return 1;
 }
 
@@ -773,6 +772,7 @@ NodePointer make_syntax_tree(){
     if(token_list[k]->tag==ID && token_list[k+1]==NULL){
         token_list[k]->left = NULL;
         token_list[k]->right = NULL;
+        k++;
         return token_list[k];
     }
 
@@ -1024,13 +1024,27 @@ NodePointer restF(){
         // printf("%s\n", token_list[k]->data.str);
         NodePointer temp = token_list[k];
         k++;
-        if(token_list[k]->tag==STR || token_list[k]->tag==ID){
-            // printf("%s\n", token_list[k]->data.str);
-            temp->left = token_list[k];
+        if(token_list[k]->tag == LB){
             k++;
-            temp->mid = E();
-            temp->right = E();
-            return temp;
+            // if(token_list[k]->tag==STR || token_list[k]->tag==ID){
+                // printf("%s\n", token_list[k]->data.str);
+                // temp->left = token_list[k];
+                temp->left = F();
+                // k++;
+                temp->mid = E();
+                temp->right = E();
+                if(token_list[k]->tag == RB){
+                    return temp;
+                }
+                else{
+                    printf("\n\nsyntax error: finish with \")\" if start with \"(\"\n\n");
+                    return (NodePointer)-1;
+                }
+            // }
+            // else{
+            //     printf("\n\nsyntax error: first parameter of \'sub\' operator must be str or ID\n\n");
+            //     return (NodePointer)-1;
+            // }
         }
         else{
             printf("\n\nsyntax error: 01\n\n");
@@ -1042,3 +1056,7 @@ NodePointer restF(){
         return (NodePointer)-1;
     }
 }
+
+/* sub         (sub\(\".*\"\,(\t)*[0-9]+\,(\t)*[0-9]+\))|(sub\(.*\,(\t)*[0-9]+\,(\t)*[0-9]+\)) */
+
+/* {sub}       {return save_token(SUB, yytext);} */
