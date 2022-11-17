@@ -73,24 +73,19 @@ int main(void)
             memory = -2;
             printf("lexical error: %s\n", yytext);
             token_num = 0;
+            token_count = 0;
             yyrestart(yyin);
-            initialize_token_list_and_free_syntax_tree();
             continue;
         }
-        /* printf("enter tok -1\n"); */
         if(memory==1){
             backup_syntax_tree_head = syntax_tree_head;
-
-            /* print_token_list(); // <--------------- */
             syntax_tree_head = make_syntax_tree();
-/* printf("check01\n"); */
-            if(syntax_tree_head==NULL)
+            if(syntax_tree_head==NULL){
                 syntax_tree_head = backup_syntax_tree_head;
-/* printf("check02\n"); */
+            }
             tree_depth = dfs_for_depth(syntax_tree_head, 0);
-/* printf("check03\n"); */
+
             RESULT result = dfs_result(syntax_tree_head);
-/* printf("check04\n"); */
             if(result.tag==INT){
                 printf("%d\n",result.data.i);
             }
@@ -100,16 +95,11 @@ int main(void)
             else if(result.tag==STR){
                 printf("\"%s\"\n",result.data.str);
             }
-
-            /* print_syntax_tree(); */
-            /* initialize_token_list(); */
-            /* initialize_token_list_and_syntax_tree(); */
+            token_num = 0;
+            token_count = 0;
         }
-        else{
-            /* printf("%d\n", memory);
-            printf("else\n"); */
-        };
     }
+    initialize_token_list_and_free_syntax_tree(); 
     printf("\nexit...\n");
 }
 // hello3 = "hello"*3

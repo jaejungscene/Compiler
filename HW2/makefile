@@ -7,31 +7,17 @@ FLAGS = -ly -lfl
 # the build target executable:
 TARGET = interpreter
 YYLEX = lex.yy.c
+OUT = parser_201923674.out
 
 all: clean $(TARGET)
 
-$(TARGET): $(YYLEX) 
-	gcc $(YYLEX) -o $(TARGET) $(FLAGS)
-	rm $(YYLEX)
-
-$(YYLEX): 
+$(TARGET):
 	flex $(TARGET).l
-
-
-TEST01 = test01
-$(TEST01):
-	flex $(TEST01).l
-	gcc $(YYLEX) -o $(TEST01) $(FLAGS)
-	rm $(YYLEX)
-
-MY = my
-$(MY):
-	flex $(MY).l
-	gcc $(YYLEX) -o $(MY) $(FLAGS)
+	gcc $(YYLEX) -o $(OUT) $(FLAGS)
 	rm $(YYLEX)
 
 clean:
-	$(RM) -rf $(TARGET) $(YYLEX) $(TEST01) $(MY)
+	$(RM) -rf $(TARGET) $(YYLEX) $(OUT)
 
 
 

@@ -8,7 +8,7 @@
 #define MAX_VALUE_LEN 64
 #define MAX_NAME_LEN 11
 #define MAX_SYMBOL_TABLE 100
-#define MAX_TOKEN_LIST 100
+#define MAX_TOKEN_LIST 500
 
 typedef enum TOK_NAME{ID=1, SUB, INT, REAL, STR, ASSIGN, PLUS, MINUS,  MULTI, DIVID, LB, RB}TOK_NAME;
 
@@ -47,10 +47,10 @@ typedef struct Node{
     NodePointer next;
 }Node;
 
-
-
 NodePointer token_list[MAX_TOKEN_LIST];
+int token_list_num = 0;
 int token_num = 0;
+int token_count = 0;
 Record symbol_table[MAX_SYMBOL_TABLE];
 int symbol_num = 0;
 NodePointer syntax_tree_head;
@@ -62,8 +62,8 @@ int k = 0; // using when syntax analyse
 
 ////////////////////// all function definition //////////////////////
 void initialize_symbol_table();
-void initialize_token_list(); // syntax tree가 완성 되었을 때
-void initialize_token_list_and_free_syntax_tree(); // syntax tree가 완성되지도 못 했을 때
+void initialize_token_list();
+void initialize_token_list_and_free_syntax_tree(); 
 void free_syntax_tree(NodePointer node);
 
 
@@ -157,23 +157,29 @@ void push_symbol_table(char* lvalue, RESULT* rvalue)
 RESULT get_value_from_table(char* id)
 {
     int i=0;
+    RESULT returnValue;
     for(i=0; i<symbol_num; i++){
         if(0==strcmp(symbol_table[i].name, id)){
             break;
         }
     }
-    RESULT returnValue;
-    returnValue.tag = symbol_table[i].type;
-    if(returnValue.tag==INT){
-        returnValue.data.i = symbol_table[i].value.i;
+    if(i>=symbol_num){
+        returnValue.tag = -1;
+        return returnValue;
     }
-    if(returnValue.tag==REAL){
-        returnValue.data.f = symbol_table[i].value.f;
+    else{
+        returnValue.tag = symbol_table[i].type;
+        if(returnValue.tag==INT){
+            returnValue.data.i = symbol_table[i].value.i;
+        }
+        if(returnValue.tag==REAL){
+            returnValue.data.f = symbol_table[i].value.f;
+        }
+        if(returnValue.tag==STR){
+            strcpy(returnValue.data.str,symbol_table[i].value.str);
+        }
+        return returnValue;
     }
-    if(returnValue.tag==STR){
-        strcpy(returnValue.data.str,symbol_table[i].value.str);
-    }
-    return returnValue;
 }
 
 
@@ -288,6 +294,10 @@ RESULT calculation(RESULT x, RESULT y, TOK_NAME operator)
             sprintf(x.data.str,"%d",x.data.i);
             strcpy(result.data.str, strcat(x.data.str, y.data.str));
         }
+        else{
+            result.tag = -1;
+            printf("runtime error: number * string is defined\n");
+        }
         return result;
     }
     else if(x.tag==STR && y.tag==REAL){
@@ -312,6 +322,14 @@ RESULT calculation(RESULT x, RESULT y, TOK_NAME operator)
         }
         return result;
     }
+    else{
+        if(x.tag==INT && y.tag==STR)
+            printf("runtime error: number * string is defined\n");
+        if(x.tag==-1 || y.tag==-1)
+            printf("runtime error: 01\n");
+        result.tag = -1;
+        return result;
+    }
 
 }
 
@@ -319,7 +337,9 @@ RESULT calculation(RESULT x, RESULT y, TOK_NAME operator)
 
 RESULT dfs_result(NodePointer node)
 {   
-    if(node==NULL) { RESULT result; result.tag=-1; return result; }
+    if(node==NULL) { printf("syntax error: 02\n"); RESULT result; result.tag=-1; return result; }
+    if(token_count!=token_num) { printf("syntax error: 02\n"); RESULT result; result.tag=-1; return result; }
+    
     if(node->tag==ASSIGN){
         RESULT result = dfs_result(node->right);
         push_symbol_table((node->left)->data.str, &result);
@@ -337,7 +357,7 @@ RESULT dfs_result(NodePointer node)
             return result;
         }
         else{
-            printf("runtime error:\n");
+            printf("runtime error: 02\n");
             result.tag = -1;
             return result;
         }
@@ -427,18 +447,18 @@ void free_syntax_tree(NodePointer node)
 
 
 void initialize_token_list_and_free_syntax_tree()
-{// syntax tree가 완성되지도 못 했을 때
-    for(int i=0; i<token_num; i++){
+{
+    for(int i=0; i<token_list_num; i++){
         free(token_list[i]);
         token_list[i] = NULL;
     }
-    token_num = 0;
+    token_list_num = 0;
     k = 0;
 }
 
 void initialize_token_list()
-{// syntax tree가 완성 되었을 때
-    token_num = 0;
+{
+    token_list_num = 0;
     k = 0;
 }
 
@@ -473,7 +493,8 @@ int save_token(TOK_NAME tag, char* token)
     newNode->mid = NULL;
     newNode->right = NULL;
     newNode->next = NULL;
-    token_list[token_num] = newNode;
+    token_list[token_list_num] = newNode;
+    token_list_num++;
     token_num++;
     return 1;
 }
@@ -492,13 +513,13 @@ bool isOperator(TOK_NAME tag)
 
 
 void print_token_list(){
-    for(int i=0; i<token_num; i++){
+    for(int i=0; i<token_list_num; i++){
         if(token_list[i]->tag==INT)
-            printf("%d ", token_list[i]->data.i);
+            printf("%d|", token_list[i]->data.i);
         else if(token_list[i]->tag==REAL)
-            printf("%.3f ", token_list[i]->data.f);
+            printf("%.3f|", token_list[i]->data.f);
         else
-            printf("%s ", token_list[i]->data.str);
+            printf("%s|", token_list[i]->data.str);
     }
     printf("\n");
 }
@@ -590,10 +611,11 @@ void print_syntax_tree()
 
 NodePointer make_syntax_tree(){
     if(token_list[k]->tag==ID && token_list[k+1]==NULL){
-        token_list[k]->left = NULL;
-        token_list[k]->right = NULL;
-        k++;
-        return token_list[k];
+        NodePointer temp = token_list[k];
+        temp->left = NULL;
+        temp->right = NULL;
+        k++; token_count++;
+        return temp;
     }
     return A();
 }
@@ -601,10 +623,10 @@ NodePointer make_syntax_tree(){
 
 
 NodePointer A(){
-    if(k>=token_num) return NULL;
+    if(k>=token_list_num) return NULL;
     if(token_list[k]->tag==ID){
         NodePointer temp = token_list[k];
-        k++;
+        k++; token_count++;
         NodePointer parent = restA();
         NodePointer iter = parent;
         while((iter->left)!=NULL){
@@ -657,10 +679,10 @@ NodePointer A(){
 
 
 NodePointer restA(){
-    if(k>=token_num) return NULL;
+    if(k>=token_list_num) return NULL;
     if(token_list[k]->tag==ASSIGN){
         NodePointer temp = token_list[k];
-        k++;
+        k++; token_count++;
         temp->right = A();
         return temp;
     }
@@ -690,7 +712,7 @@ NodePointer restA(){
 
 
 NodePointer E(){
-    if(k>=token_num) return NULL;
+    if(k>=token_list_num) return NULL;
     NodePointer child = T();
     NodePointer parent = restE();
     if(parent!=NULL){
@@ -709,10 +731,10 @@ NodePointer E(){
 
 
 NodePointer restE(){
-    if(k>=token_num) return NULL;
+    if(k>=token_list_num) return NULL;
     if(token_list[k]->tag==PLUS || token_list[k]->tag==MINUS){
         NodePointer temp = token_list[k];
-        k++;
+        k++; token_count++;
         temp->right = T();
         NodePointer parent = restE();
         if(parent!=NULL){
@@ -729,7 +751,7 @@ NodePointer restE(){
 
 
 NodePointer T(){
-    if(k>=token_num) return NULL;
+    if(k>=token_list_num) return NULL;
     NodePointer child = F();
     NodePointer parent = restT();
     if(parent!=NULL){
@@ -747,10 +769,10 @@ NodePointer T(){
 
 
 NodePointer restT(){
-    if(k>=token_num) return NULL;
+    if(k>=token_list_num) return NULL;
     if(token_list[k]->tag==MULTI || token_list[k]->tag==DIVID){
         NodePointer temp = token_list[k];
-        k++;
+        k++; token_count++;
         temp->right = F();
         NodePointer parent = restT();
         if(parent!=NULL){
@@ -766,10 +788,10 @@ NodePointer restT(){
 
 
 NodePointer F(){
-    if(k>=token_num) return NULL;
+    if(k>=token_list_num) return NULL;
     if(token_list[k]->tag==ID){
         NodePointer temp = token_list[k];
-        k++;
+        k++; token_count++;
         return temp;
     }
     else{
@@ -778,75 +800,70 @@ NodePointer F(){
 }
 
 NodePointer restF(){
-    if(k>=token_num) return NULL;
+    if(k>=token_list_num) return NULL;
     if(token_list[k]->tag==LB){
-        k++;
+        k++; token_count++;
         NodePointer temp = A();
         if(token_list[k]->tag==RB){
-            k++;
+            k++; token_count++;
             return temp;
         }
-        else{
-            printf("\n\nsytax error: there should be \')\'\n\n");
-            return (NodePointer)-1;
-        }
+        // else{
+        //     printf("\n\nsytax error: there should be \')\'\n\n");
+        //     return (NodePointer)-1;
+        // }
     }
     else if(token_list[k]->tag==INT){
         NodePointer temp = token_list[k];
-        k++;
+        k++; token_count++;
         return temp;
     }
     else if(token_list[k]->tag==REAL){
         NodePointer temp = token_list[k];
-        k++;
+        k++; token_count++;
         return temp;
     }
     else if(token_list[k]->tag==STR){
         NodePointer temp = token_list[k];
-        k++;
+        k++; token_count++;
         return temp;
     }
     else if(token_list[k]->tag==MINUS){ //unary operator
         NodePointer temp = token_list[k];
-        k++;
+        k++; token_count++;
         temp->left = F();
         return temp;
     }
     else if(token_list[k]->tag==PLUS){
         NodePointer temp = token_list[k];
-        k++;
+        k++; token_count++;
         temp->left = F();
         return temp;
     }
     else if(token_list[k]->tag==SUB){
         NodePointer temp = token_list[k];
-        k++;
+        k++; token_count++;
         if(token_list[k]->tag == LB){
-            k++;
+            k++; token_count++;
             temp->left = F();
-            // k++;
             temp->mid = E();
             temp->right = E();
             if(token_list[k]->tag == RB){
-                k++;
+                k++; token_count++;
                 return temp;
             }
-            else{
-                printf("\n\nsyntax error: finish with \")\" if start with \"(\"\n\n");
-                return (NodePointer)-1;
-            }
+            // else{
+            //     printf("\n\nsyntax error: finish with \")\" if start with \"(\"\n\n");
+            //     return (NodePointer)-1;
+            // }
         }
-        else{
-            printf("\n\nsyntax error: \'sub\' operator start with \'(\'\n");
-            return (NodePointer)-1;
-        }
+        // else{
+        //     printf("\n\nsyntax error: \'sub\' operator start with \'(\'\n");
+        //     return (NodePointer)-1;
+        // }
     }
-    else{
-        printf("\n\nsyntax error:\n\n");
-        return (NodePointer)-1;
-    }
+    // else{
+    //     printf("\n\nsyntax error: 01\n\n");
+    //     return (NodePointer)-1;
+    // }
 }
-
-/* sub         (sub\(\".*\"\,(\t)*[0-9]+\,(\t)*[0-9]+\))|(sub\(.*\,(\t)*[0-9]+\,(\t)*[0-9]+\)) */
-
-/* {sub}       {return save_token(SUB, yytext);} */
