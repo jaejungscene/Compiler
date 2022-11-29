@@ -5,10 +5,11 @@ CFLAGS  = -g -Wall
 FLAGS = -ly -lfl
 
 # the build target executable:
-TARGET = calc
+TARGET = generator
 YYLEX = lex.yy.c
+
+OUT = generator # <------ 제출 전에 바꿔라
 # OUT = parser_201923674.out
-OUT = calc
 
 all: clean $(TARGET)
 
@@ -16,6 +17,7 @@ $(TARGET):
 	flex $(TARGET).l
 	bison -d -b $(TARGET) $(TARGET).y
 	gcc -o $(OUT) $(TARGET).tab.c $(YYLEX) $(FLAGS)
+	rm -rf $(TARGET).tab.c $(YYLEX)
 
 clean:
 	$(RM) -rf $(TARGET).tab.c $(TARGET).tab.h $(YYLEX) $(OUT)
