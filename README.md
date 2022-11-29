@@ -1,5 +1,5 @@
 # Compiler Study
-## [about lex & yacc](http://dinosaur.compilertools.net/)
+## [About Lex & Yacc](http://dinosaur.compilertools.net/)
 ## [Makefile Tutorial](https://makefiletutorial.com/)
 ```
 CC = gcc
@@ -7,7 +7,7 @@ CC = gcc
 target1 : dependency 1 ...
     command 1
 ```
-- special symbols ([see here])(https://stackoverflow.com/questions/3220277/what-do-the-makefile-symbols-and-mean)
+- special symbols [see here](https://stackoverflow.com/questions/3220277/what-do-the-makefile-symbols-and-mean)
     For example, consider the following declaration:
     ```
     all: library.cpp main.cpp
