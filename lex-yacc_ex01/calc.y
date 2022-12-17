@@ -4,19 +4,28 @@ void yyerror(char *);
 int yylex(void);
 int sym[26];
 %}
-%token INTEGER VARIABLE
+
+%union{
+    int value;
+    int name;
+}
+
+%token <name> VARIABLE
+%token <value> INTEGER
+%type <value> expr
+
 %left '*' '/'
 %left '+' '-'
 %%
 
 program:
     program statement '\n'
-    |
+    | statement '\n'
     ;
 
 statement: 
     expr                    {printf("> %d\n", $1);}
-    | VARIABLE '=' expr     {sym[$1] = $3; printf("%d\n", $1);}
+    | VARIABLE '=' expr     {sym[$1] = $3;}
     ;
 
 expr:
@@ -36,6 +45,6 @@ void yyerror(char *s) {
 }
 int main(void) {
     yyparse();
-    printf("exit the program...\n");
+    printf("\nexit the program...\n");
     return 0;
 }

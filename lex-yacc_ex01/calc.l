@@ -3,9 +3,13 @@
 #include "calc.tab.h"
 void yyerror (char *);
 %}
+
+id          [a-z]
+number      [0-9]+
+
 %%
-[a-z]       {yylval = *yytext - 'a'; return VARIABLE;}
-[0-9]+      {yylval = atoi(yytext); return INTEGER;}
+{id}        {yylval.name = yytext[0] - 'a'; return VARIABLE;}
+{number}    {yylval.value = atoi(yytext); return INTEGER;}
 [-+()=/*\n] {return *yytext;}
 [ \t]       ;
 .           yyerror("invalid character");
