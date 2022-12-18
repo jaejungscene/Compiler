@@ -25,11 +25,6 @@ double      (0|[1-9][0-9]*)*\.(0|[0-9]*[1-9])*
 .               yyerror(yytext);
 %%
 
-
-/**
-* lex library
-* https://www.ibm.com/docs/en/aix/7.1?topic=information-lex-library
-**/
 int yywrap(void){ // return the value 1 when the end of input occurs.
     return 1;
 }

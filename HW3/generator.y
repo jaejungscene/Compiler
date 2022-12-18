@@ -29,15 +29,10 @@ extern int yylex();
 
 
 program:
-    statement ';'                   {printf("----------\n");gen($1,NULL); free_all($1);}
-    | statement ';' '\n'            {printf("----------\n");gen($1,NULL); free_all($1); linenum++;}
-    | program statement ';'         {printf("----------\n");gen($2,NULL); free_all($2);}
-    | program statement ';' '\n'    {printf("----------\n");gen($2,NULL); free_all($2); linenum++;}
-    /* | error ';'               { printf("hello\n");}
-    | statement error ';'               {printf("01\n");}
-    | statement error ';' '\n'          {printf("02\n");}
-    | program statement error ';'       {printf("03\n");}
-    | program statement error ';' '\n'  {printf("04\n");} */
+    statement ';'                   {gen($1,NULL); free_all($1);}
+    | statement ';' '\n'            {gen($1,NULL); free_all($1); linenum++;}
+    | program statement ';'         {gen($2,NULL); free_all($2);}
+    | program statement ';' '\n'    {gen($2,NULL); free_all($2); linenum++;}
     ;
 
 statement:
