@@ -1,22 +1,30 @@
 %{
 #include <stdlib.h>
+#include <string.h>
 #include "generator.tab.h"
-void yyerror (char *);
+extern void yyerror(char *);
 %}
 
 id          [a-zA-Z][a-zA-Z0-9]*
 integer     [1-9][0-9]*
-double      [1-9][0-9]*)*\.(0|[0-9]*[1-9])*
+double      (0|[1-9][0-9]*)*\.(0|[0-9]*[1-9])*
 
 %%
-{id}            {yylval.name = yytext[0] - 'a'; return VARNAME;}
-{integer}       {yylval.value = atoi(yytext); return INTEGER;}
-{double}        {return save_token(REAL, yytext); return DOUBLE;}
+("int"|"double")    {strncpy(yylval.symbol, yytext, 10);
+                    yylval.symbol[strlen(yylval.symbol)] = '\0';
+                    return VARTYPE;}
+{id}            {strncpy(yylval.symbol, yytext, 10);
+                yylval.symbol[strlen(yylval.symbol)] = '\0';
+                return SYMBOL;}
+{integer}       {yylval.ival = atoi(yytext); 
 
-[-+()=/*\n] {return *yytext;}
-[ \t]       ;
-.           yyerror("invalid character");
+                return INTEGER;}
+{double}        { yylval.dval = atof(yytext); return DOUBLE;}
+[-+()=/*;,\n]   {return *yytext;}
+[ \t\n]         ;
+.               yyerror(yytext);
 %%
+
 
 /**
 * lex library

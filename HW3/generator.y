@@ -1,56 +1,91 @@
 %{
 #include <stdio.h>
-void yyerror(char *);
-int yylex(void);
-int sym[26];
+#include "header.h"
+void yyerror (char *);
+extern int yylex();
 %}
+
 
 %union{
     int ival;
     double dval;
-    int name;
+    char symbol[11];
+    struct Node* node;
 }
 
-%token <name> VARNAME
+%type <node> program statement expr assign_vars
+%token <symbol> SYMBOL
+%token <symbol> VARTYPE
 %token <ival> INTEGER
 %token <dval> DOUBLE
-%type <integer> expr
 
-%left '*' '/'
 %left '+' '-'
+%left '*' '/'
 %nonassoc UMINUS
 %nonassoc UPLUS
+
+
 %%
 
+
 program:
-    statement '\n'
-    | program statement '\n'
+    statement ';'                   {printf("----------\n");gen($1,NULL); free_all($1);}
+    | statement ';' '\n'            {printf("----------\n");gen($1,NULL); free_all($1); linenum++;}
+    | program statement ';'         {printf("----------\n");gen($2,NULL); free_all($2);}
+    | program statement ';' '\n'    {printf("----------\n");gen($2,NULL); free_all($2); linenum++;}
+    /* | error ';'               { printf("hello\n");}
+    | statement error ';'               {printf("01\n");}
+    | statement error ';' '\n'          {printf("02\n");}
+    | program statement error ';'       {printf("03\n");}
+    | program statement error ';' '\n'  {printf("04\n");} */
     ;
 
-statement: 
-    expr                        {printf("> %d\n", $1);}
-    | VARNAME '=' expr          {sym[$1] = $3;}
+statement:
+    expr
+    | VARTYPE assign_vars           {$$ = makeNode(VART, $1, $2, NULL);}
+    | assign_vars '=' expr          {$$ = makeNode(ASSIGN, NULL, $1, $3);}
     ;
 
 expr:
-    INTEGER
-    | VARNAME                   {$$ = sym[$1];}
-    | expr '+' expr             {$$ = $1 + $3;}
-    | expr '-' expr             {$$ = $1 - $3;}
-    | expr '*' expr             {$$ = $1 * $3;}
-    | expr '/' expr             {$$ = $1 / $3;}
-    | '-' expr %prec UMINUS     {$$ = -$2;}
-    | '+' expr %prec UPLUS      {$$ = $2;}
-    | '(' expr ')'              {$$ = $2;}
+    SYMBOL                          {$$ = makeNode(SYM, $1, NULL, NULL);}
+    | INTEGER                       {$$ = makeNode(INT, &$1, NULL, NULL);}
+    | DOUBLE                        {$$ = makeNode(REAL, &$1, NULL, NULL);}
+    | expr '+' expr                 {$$ = makeNode(PLUS, NULL, $1, $3);}
+    | expr '-' expr                 {$$ = makeNode(MINUS, NULL, $1, $3);}
+    | expr '*' expr                 {$$ = makeNode(MULTIP, NULL, $1, $3);}
+    | expr '/' expr                 {$$ = makeNode(DIVIDE, NULL, $1, $3);}
+    | '-' expr %prec UMINUS         {$$ = makeNode(UMIN, NULL, $2, NULL);}
+    | '+' expr %prec UPLUS          {$$ = makeNode(UPLU, NULL, $2, NULL);}
+    | '(' expr ')'                  {$$ = $2;}
     ;
+
+assign_vars:
+    SYMBOL                            {$$ = makeNode(ASYM, $1, NULL, NULL);}
+    | assign_vars ',' SYMBOL          {$$ = makeNode(ASYM, $3, $1, NULL);}
+    ;
+
 
 %%
 
+
+
 void yyerror(char *s) {
-    fprintf(stderr, "%s\n", s);
+    if(strcmp("syntax error",s)==0){
+        fprintf(stderr, "=> %s(%d)\n", s, linenum);
+    }
+    else{
+        fprintf(stderr, "=> lexical error(%d) %s\n", linenum, s);
+        exit(1);
+    }
 }
+
 int main(void) {
+    FILE *out = fopen("./ic.out", "w");
+    fputs("\0", out);
+    fclose(out);
+
     yyparse();
+    out_symbol_table();
     printf("\nexit the program...\n");
     return 0;
 }

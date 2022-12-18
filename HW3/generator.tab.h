@@ -45,8 +45,12 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    VARIABLE = 258,
-    INTEGER = 259
+    SYMBOL = 258,
+    VARTYPE = 259,
+    INTEGER = 260,
+    DOUBLE = 261,
+    UMINUS = 262,
+    UPLUS = 263
   };
 #endif
 
@@ -55,12 +59,14 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 8 "generator.y" /* yacc.c:1909  */
+#line 9 "generator.y" /* yacc.c:1909  */
 
-    int value;
-    int name;
+    int ival;
+    double dval;
+    char symbol[11];
+    struct Node* node;
 
-#line 64 "generator.tab.h" /* yacc.c:1909  */
+#line 70 "generator.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
