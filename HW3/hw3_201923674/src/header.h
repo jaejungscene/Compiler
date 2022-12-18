@@ -161,25 +161,21 @@ void gen(NodePointer now, NodePointer parent)
             sprintf(str, "%s = %d\n", now->name, parent->val.i);
             fputs(str, out);
             printf("%s", str);
-            // printf("%s = %d", now->name, parent->val.i);
         }
         else if(parent->type==REAL){
             sprintf(str, "%s = %.2f\n", now->name, parent->val.d);
             fputs(str, out);
             printf("%s", str);
-            // printf("%s = %.2f", now->name, parent->val.d);
         }
         else if(parent->type==SYM){
             sprintf(str, "%s = %s\n", now->name, parent->name);
             fputs(str, out);
             printf("%s", str);
-            // printf("%s = %s", now->name, parent->name);
         }
         else{
             sprintf(str, "%s = t%d\n", now->name, parent->val.i);
             fputs(str, out);
             printf("%s", str);
-            // printf("%s = t%d", now->name, parent->val.i);
         }
 
         if(parent->inhtype!=now->inhtype){
@@ -200,25 +196,21 @@ void gen(NodePointer now, NodePointer parent)
             sprintf(str, "t%d = %c%d\n", tnum, op,now->left->val.i);
             fputs(str,out);
             printf("%s", str);
-            // printf("t%d = %c%d\n", tnum, op,now->left->val.i);
         }
         else if(now->left->type==REAL){
             sprintf(str, "t%d = %c%.2f\n", tnum, op,now->left->val.d);
             fputs(str,out);
             printf("%s", str);
-            // printf("t%d = %c%.2f\n", tnum, op, now->left->val.d);
         }
         else if(now->left->type==SYM){
             sprintf(str, "t%d = %c%s\n", tnum, op, now->left->name);
             fputs(str,out);
             printf("%s", str);
-            // printf("t%d = %c%s\n", tnum, op, now->left->name);
         }
         else if(now->left->type>=PLUS){
             sprintf(str, "t%d = %ct%d\n", tnum, op,now->left->val.i);
             fputs(str,out);
             printf("%s", str);
-            // printf("t%d = %ct%d\n", tnum, op, now->left->val.i);
         }
         else{}
         tnum++;
@@ -238,14 +230,12 @@ void gen(NodePointer now, NodePointer parent)
                 sprintf(str, "t%d = inttoreal %s\n", tnum, now->left->name);
                 fputs(str, out);
                 printf("%s", str);
-                // printf("t%d = inttoreal %s\n", tnum, now->left->name);
                 sprintf(now->left->name, "t%d", tnum);
             }
             else{
                 sprintf(str, "t%d = inttoreal %s\n", tnum, now->right->name);
                 fputs(str, out);
                 printf("%s", str);
-                // printf("t%d = inttoreal %s\n", tnum, now->right->name);
                 sprintf(now->right->name, "t%d", tnum);
             }
             tnum++;
@@ -273,25 +263,21 @@ void gen(NodePointer now, NodePointer parent)
             sprintf(str, "t%d = %s %c %d\n", tnum, temp, op, now->right->val.i);
             fputs(str, out);
             printf("%s", str);
-            // printf("t%d = %s %c %d\n", tnum, temp, op, now->right->val.i);
         }
         else if(now->right->type==REAL){
             sprintf(str, "t%d = %s %c %.2f\n", tnum, temp, op, now->right->val.d);
             fputs(str, out);
             printf("%s", str);
-            // printf("t%d = %s %c %.2f\n", tnum, temp, op, now->right->val.d);
         }
         else if(now->right->type==SYM){
             sprintf(str, "t%d = %s %c %s\n", tnum, temp, op, now->right->name);
             fputs(str, out);
             printf("%s", str);
-            // printf("t%d = %s %c %s\n", tnum, temp, op, now->right->name);
         }
         else if(now->right->type>=PLUS){
             sprintf(str, "t%d = %s %c t%d\n", tnum, temp, op, now->right->val.i);
             fputs(str, out);
             printf("%s", str);
-            // printf("t%d = %s %c t%d\n", tnum, temp, op, now->right->val.i);
         }
         else{}
         now->val.i = tnum;
