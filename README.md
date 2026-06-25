@@ -1,6 +1,6 @@
-# Compiler Study
-## [About Lex & Yacc](http://dinosaur.compilertools.net/)
-## [Makefile Tutorial](https://makefiletutorial.com/)
+## Compiler Study
+#### > [About Lex & Yacc](https://wiki.imindlabs.com.au/cs/lang/pl/5_lex_and_yacc/1_basics/)
+#### > [Makefile Tutorial](https://makefiletutorial.com/)
 ```
 CC = gcc
 
